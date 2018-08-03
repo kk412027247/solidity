@@ -1,7 +1,66 @@
 pragma solidity ^0.4.0;
 
 
-contract MyFirstContract{
+//Interfaces are similar to abstract contracts, but they cannot have any functions implemented. There are further restrictions:
+//                                       √
+//Cannot inherit other contracts or interfaces.
+//Cannot define constructor.
+//Cannot define variables.
+//Cannot define structs.
+//Cannot define enums.
+//Some of these restrictions might be lifted in the future.
+
+
+interface Regulator{
+ function checkValue(uint amount) returns (bool);
+ function loan() returns(bool);
+}
+
+
+contract Bank is Regulator {
+ uint private value ;
+ address private owner;
+
+ modifier ownerFunc{
+  require(owner == msg.sender);
+  _;
+ }
+
+
+ function Bank(uint amount){
+  value = amount;
+  owner = msg.sender;
+ }
+
+
+ function deposit(uint amount) ownerFunc {
+  value += amount;
+ }
+
+ function withdraw(uint amount) ownerFunc {
+  if(checkValue(amount)){
+   value -= amount;
+  }
+ }
+
+ function balance() returns(uint){
+  return value;
+ }
+
+ function checkValue(uint amount) returns(bool){
+  return value >= amount;
+ }
+
+ function loan() returns(bool){
+  return value > 0;
+ }
+
+}
+
+
+contract MyFirstContract is Bank(10){
+
+
  string private name;
  uint private age;
  function setName(string newName)   {
@@ -21,4 +80,24 @@ contract MyFirstContract{
  function getAge() returns(uint){
   return age;
  }
+
+}
+
+
+contract TextThrows{
+ function testAssert(){
+  assert(1 ==2 );
+ }
+ function testRequire(){
+  require(2 ==1);
+ }
+
+ function testRevert(){
+  revert();
+ }
+
+ function testThrow(){
+  throw;
+ }
+
 }
